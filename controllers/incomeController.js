@@ -1,115 +1,115 @@
-const Expense = require("../models/Expense");
+const Income = require("../models/Income");
 
-// Create a new expense
-exports.createExpense = async (req, res) => {
+// Create a new income
+exports.createIncome = async (req, res) => {
     try {
         const userId = req.user.id;
-        const { icon, category, amount, date } = req.body;
+        const { icon, source, amount, date } = req.body;
 
         // Validate request
-        if (!category || !amount || !date) {
-            return res.status(400).json({ message: "Please provide category, amount, and date" });
+        if (!source || !amount || !date) {
+            return res.status(400).json({ message: "Please provide source, amount, and date" });
         }
 
-        // Create expense
-        const expense = await Expense.create(userId, { icon, category, amount, date });
+        // Create income
+        const income = await Income.create(userId, { icon, source, amount, date });
 
         res.status(201).json({
             success: true,
-            data: expense,
+            data: income,
         });
     } catch (error) {
-        console.error("Error creating expense:", error);
+        console.error("Error creating income:", error);
         res.status(500).json({
             success: false,
-            message: "Failed to create expense",
+            message: "Failed to create income",
             error: error.message,
         });
     }
 };
 
-// Get all expenses for a user
-exports.getExpenses = async (req, res) => {
+// Get all income records for a user
+exports.getIncomes = async (req, res) => {
     try {
         const userId = req.user.id;
 
         // Get filter parameters from query
-        const { startDate, endDate, category } = req.query;
+        const { startDate, endDate, source } = req.query;
 
-        // Fetch expenses
-        const expenses = await Expense.findByUserId(userId, { startDate, endDate, category });
+        // Fetch income records
+        const incomes = await Income.findByUserId(userId, { startDate, endDate, source });
 
         res.status(200).json({
             success: true,
-            count: expenses.length,
-            data: expenses,
+            count: incomes.length,
+            data: incomes,
         });
     } catch (error) {
-        console.error("Error fetching expenses:", error);
+        console.error("Error fetching income records:", error);
         res.status(500).json({
             success: false,
-            message: "Failed to fetch expenses",
+            message: "Failed to fetch income records",
             error: error.message,
         });
     }
 };
 
-// Get a single expense
-exports.getExpense = async (req, res) => {
+// Get a single income record
+exports.getIncome = async (req, res) => {
     try {
         const userId = req.user.id;
-        const expenseId = req.params.id;
+        const incomeId = req.params.id;
 
-        // Find expense
-        const expense = await Expense.findById(expenseId, userId);
+        // Find income
+        const income = await Income.findById(incomeId, userId);
 
-        if (!expense) {
+        if (!income) {
             return res.status(404).json({
                 success: false,
-                message: "Expense not found",
+                message: "Income record not found",
             });
         }
 
         res.status(200).json({
             success: true,
-            data: expense,
+            data: income,
         });
     } catch (error) {
-        console.error("Error fetching expense:", error);
+        console.error("Error fetching income record:", error);
         res.status(500).json({
             success: false,
-            message: "Failed to fetch expense",
+            message: "Failed to fetch income record",
             error: error.message,
         });
     }
 };
 
-// Update an expense
-exports.updateExpense = async (req, res) => {
+// Update an income record
+exports.updateIncome = async (req, res) => {
     try {
         const userId = req.user.id;
-        const expenseId = req.params.id;
-        const { icon, category, amount, date } = req.body;
+        const incomeId = req.params.id;
+        const { icon, source, amount, date } = req.body;
 
         // Validate request
-        if (!category || !amount || !date) {
-            return res.status(400).json({ message: "Please provide category, amount, and date" });
+        if (!source || !amount || !date) {
+            return res.status(400).json({ message: "Please provide source, amount, and date" });
         }
 
-        // Check if expense exists
-        const existingExpense = await Expense.findById(expenseId, userId);
+        // Check if income exists
+        const existingIncome = await Income.findById(incomeId, userId);
 
-        if (!existingExpense) {
+        if (!existingIncome) {
             return res.status(404).json({
                 success: false,
-                message: "Expense not found",
+                message: "Income record not found",
             });
         }
 
-        // Update expense
-        const updated = await Expense.update(expenseId, userId, {
+        // Update income
+        const updated = await Income.update(incomeId, userId, {
             icon,
-            category,
+            source,
             amount,
             date,
         });
@@ -117,91 +117,91 @@ exports.updateExpense = async (req, res) => {
         if (!updated) {
             return res.status(400).json({
                 success: false,
-                message: "Failed to update expense",
+                message: "Failed to update income record",
             });
         }
 
-        // Get updated expense
-        const updatedExpense = await Expense.findById(expenseId, userId);
+        // Get updated income
+        const updatedIncome = await Income.findById(incomeId, userId);
 
         res.status(200).json({
             success: true,
-            data: updatedExpense,
+            data: updatedIncome,
         });
     } catch (error) {
-        console.error("Error updating expense:", error);
+        console.error("Error updating income record:", error);
         res.status(500).json({
             success: false,
-            message: "Failed to update expense",
+            message: "Failed to update income record",
             error: error.message,
         });
     }
 };
 
-// Delete an expense
-exports.deleteExpense = async (req, res) => {
+// Delete an income record
+exports.deleteIncome = async (req, res) => {
     try {
         const userId = req.user.id;
-        const expenseId = req.params.id;
+        const incomeId = req.params.id;
 
-        // Check if expense exists
-        const expense = await Expense.findById(expenseId, userId);
+        // Check if income exists
+        const income = await Income.findById(incomeId, userId);
 
-        if (!expense) {
+        if (!income) {
             return res.status(404).json({
                 success: false,
-                message: "Expense not found",
+                message: "Income record not found",
             });
         }
 
-        // Delete expense
-        const deleted = await Expense.delete(expenseId, userId);
+        // Delete income
+        const deleted = await Income.delete(incomeId, userId);
 
         if (!deleted) {
             return res.status(400).json({
                 success: false,
-                message: "Failed to delete expense",
+                message: "Failed to delete income record",
             });
         }
 
         res.status(200).json({
             success: true,
-            message: "Expense deleted successfully",
+            message: "Income record deleted successfully",
         });
     } catch (error) {
-        console.error("Error deleting expense:", error);
+        console.error("Error deleting income record:", error);
         res.status(500).json({
             success: false,
-            message: "Failed to delete expense",
+            message: "Failed to delete income record",
             error: error.message,
         });
     }
 };
 
-// Get expense summary
-exports.getExpenseSummary = async (req, res) => {
+// Get income summary
+exports.getIncomeSummary = async (req, res) => {
     try {
         const userId = req.user.id;
         const { period = "month", startDate, endDate } = req.query;
 
-        // Get total expenses
-        const totalExpenses = await Expense.getTotal(userId, { startDate, endDate });
+        // Get total income
+        const totalIncome = await Income.getTotal(userId, { startDate, endDate });
 
-        // Get category breakdown
-        const categoryBreakdown = await Expense.getCategorySummary(userId, period);
+        // Get source breakdown
+        const sourceBreakdown = await Income.getSourceSummary(userId, period);
 
         res.status(200).json({
             success: true,
             data: {
-                totalExpenses,
-                categoryBreakdown,
+                totalIncome,
+                sourceBreakdown,
             },
         });
     } catch (error) {
-        console.error("Error getting expense summary:", error);
+        console.error("Error getting income summary:", error);
         res.status(500).json({
             success: false,
-            message: "Failed to get expense summary",
+            message: "Failed to get income summary",
             error: error.message,
         });
     }
