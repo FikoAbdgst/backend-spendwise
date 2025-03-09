@@ -1,0 +1,103 @@
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+    "full_name": "bagas",
+    "email": "bagas123@spendwise.com",
+    "password": "bagas123"
+}
+
+###
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "bagas123@spendwise.com",
+  "password": "bagas123"
+}
+
+# cek expense
+###
+GET http://localhost:3000/api/expenses
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJiYWdhczEyM0BzcGVuZHdpc2UuY29tIiwiaWF0IjoxNzQxNDQzMTI5LCJleHAiOjE3NDE1Mjk1Mjl9.jTeOtYCuc5woNcqgYhttQrfgWXRggNKUez7e1SZLdO0
+
+# tambah expense
+###
+POST http://localhost:3000/api/expenses
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJiYWdhczEyM0BzcGVuZHdpc2UuY29tIiwiaWF0IjoxNzQxNDQzMTI5LCJleHAiOjE3NDE1Mjk1Mjl9.jTeOtYCuc5woNcqgYhttQrfgWXRggNKUez7e1SZLdO0
+
+{
+  "category": "Ayam Goreng",
+  "amount": 10000,
+  "date": "2025-03-04",
+  "icon": "🍗"
+}
+
+### update expense
+PUT http://localhost:3000/api/expenses/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJiYWdhczEyM0BzcGVuZHdpc2UuY29tIiwiaWF0IjoxNzQxNDQzMTI5LCJleHAiOjE3NDE1Mjk1Mjl9.jTeOtYCuc5woNcqgYhttQrfgWXRggNKUez7e1SZLdO0
+
+{
+  "category": "Transport",
+  "amount": 50000,
+  "date": "2025-03-05",
+  "icon": "🚗"
+}
+
+### hapus expense
+DELETE http://localhost:3000/api/expenses/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJiYWdhczEyM0BzcGVuZHdpc2UuY29tIiwiaWF0IjoxNzQxNDQzMTI5LCJleHAiOjE3NDE1Mjk1Mjl9.jTeOtYCuc5woNcqgYhttQrfgWXRggNKUez7e1SZLdO0
+
+# cek income
+###
+GET http://localhost:3000/api/income
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJiYWdhczEyM0BzcGVuZHdpc2UuY29tIiwiaWF0IjoxNzQxNDQzMTI5LCJleHAiOjE3NDE1Mjk1Mjl9.jTeOtYCuc5woNcqgYhttQrfgWXRggNKUez7e1SZLdO0
+
+### tambah income
+POST http://localhost:3000/api/income
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJiYWdhczEyM0BzcGVuZHdpc2UuY29tIiwiaWF0IjoxNzQxNDQzMTI5LCJleHAiOjE3NDE1Mjk1Mjl9.jTeOtYCuc5woNcqgYhttQrfgWXRggNKUez7e1SZLdO0
+
+{
+  "source": "Joki Web",
+  "amount": 100000,
+  "date": "2025-03-04",
+  "icon": "💰"
+}
+
+### edit income
+PUT http://localhost:3000/api/income/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJiYWdhczEyM0BzcGVuZHdpc2UuY29tIiwiaWF0IjoxNzQxNDQzMTI5LCJleHAiOjE3NDE1Mjk1Mjl9.jTeOtYCuc5woNcqgYhttQrfgWXRggNKUez7e1SZLdO0
+
+{
+  "source": "Joki Web",
+  "amount": 200000,
+  "date": "2025-03-05",
+  "icon": "💻"
+}
+
+### hapus income
+DELETE http://localhost:3000/api/income/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJiYWdhczEyM0BzcGVuZHdpc2UuY29tIiwiaWF0IjoxNzQxNDQzMTI5LCJleHAiOjE3NDE1Mjk1Mjl9.jTeOtYCuc5woNcqgYhttQrfgWXRggNKUez7e1SZLdO0
+
+
+# cek balance
+###
+GET http://localhost:3000/api/balance/summary
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJiYWdhczEyM0BzcGVuZHdpc2UuY29tIiwiaWF0IjoxNzQxNDQzMTI5LCJleHAiOjE3NDE1Mjk1Mjl9.jTeOtYCuc5woNcqgYhttQrfgWXRggNKUez7e1SZLdO0
+
+
+### recent transaction
+GET http://localhost:3000/api/balance/recent-transactions
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJiYWdhczEyM0BzcGVuZHdpc2UuY29tIiwiaWF0IjoxNzQxNDQzMTI5LCJleHAiOjE3NDE1Mjk1Mjl9.jTeOtYCuc5woNcqgYhttQrfgWXRggNKUez7e1SZLdO0
+
+### monthly
+GET http://localhost:3000/api/balance/monthly-balance
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJiYWdhczEyM0BzcGVuZHdpc2UuY29tIiwiaWF0IjoxNzQxNDQzMTI5LCJleHAiOjE3NDE1Mjk1Mjl9.jTeOtYCuc5woNcqgYhttQrfgWXRggNKUez7e1SZLdO0
+
+### monthly
+GET http://localhost:3000/api/balance/summary-by-date
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJiYWdhczEyM0BzcGVuZHdpc2UuY29tIiwiaWF0IjoxNzQxNDQzMTI5LCJleHAiOjE3NDE1Mjk1Mjl9.jTeOtYCuc5woNcqgYhttQrfgWXRggNKUez7e1SZLdO0
