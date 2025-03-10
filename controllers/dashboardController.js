@@ -99,8 +99,8 @@ exports.getMonthlyData = async (req, res) => {
 
     const today = new Date();
     const monthsData = [];
-
-    for (let i = A5; i >= 0; i--) {
+    const monthsBack = 6;
+    for (let i = monthsBack; i >= 0; i--) {
       const startOfMonth = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const endOfMonth = new Date(today.getFullYear(), today.getMonth() - i + 1, 0);
 
@@ -108,7 +108,7 @@ exports.getMonthlyData = async (req, res) => {
       const endDate = endOfMonth.toISOString().split("T")[0];
 
       const [incomeResults] = await db.execute(
-        `SELECT COALESCE(SUM(amount), 0) as total FROM incomes 
+        `SELECT COALESCE(SUM(amount), 0) as total FROM income 
          WHERE user_id = ? AND date BETWEEN ? AND ?`,
         [userId, startDate, endDate]
       );
@@ -163,7 +163,7 @@ exports.getWeeklyData = async (req, res) => {
       const endDate = endOfWeek.toISOString().split("T")[0];
 
       const [incomeResults] = await db.execute(
-        `SELECT COALESCE(SUM(amount), 0) as total FROM incomes 
+        `SELECT COALESCE(SUM(amount), 0) as total FROM income 
          WHERE user_id = ? AND date BETWEEN ? AND ?`,
         [userId, startDate, endDate]
       );
@@ -216,7 +216,7 @@ exports.getDailyData = async (req, res) => {
       const formattedDate = date.toISOString().split("T")[0];
 
       const [incomeResults] = await db.execute(
-        `SELECT COALESCE(SUM(amount), 0) as total FROM incomes 
+        `SELECT COALESCE(SUM(amount), 0) as total FROM income 
          WHERE user_id = ? AND date = ?`,
         [userId, formattedDate]
       );
