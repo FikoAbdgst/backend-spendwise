@@ -6,16 +6,39 @@ const db = require('../config/db');
 
 const router = express.Router();
 
+// Password validation function
+const validatePassword = (password) => {
+    // At least 8 characters, 1 uppercase, 1 lowercase, 1 number
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    return passwordRegex.test(password);
+};
+
 // Register a new user
 router.post('/register', async (req, res) => {
     try {
-        const { full_name, email, password } = req.body;
+        const { full_name, email, password, confirmPassword } = req.body;
 
         // Validate input
-        if (!full_name || !email || !password) {
+        if (!full_name || !email || !password || !confirmPassword) {
             return res.status(400).json({
                 success: false,
                 message: 'Semua field harus diisi'
+            });
+        }
+
+        // Validate password and confirmPassword match
+        if (password !== confirmPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password dan konfirmasi password tidak cocok'
+            });
+        }
+
+        // Validate password strength
+        if (!validatePassword(password)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password harus minimal 8 karakter dan mengandung huruf besar, huruf kecil, dan angka'
             });
         }
 
@@ -86,7 +109,7 @@ router.post('/login', async (req, res) => {
         if (users.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: 'Email atau password salah'
+                message: 'Email belum terdaftar'
             });
         }
 
@@ -97,7 +120,7 @@ router.post('/login', async (req, res) => {
         if (!validPassword) {
             return res.status(400).json({
                 success: false,
-                message: 'Email atau password salah'
+                message: 'Password kurang tepat'
             });
         }
 
