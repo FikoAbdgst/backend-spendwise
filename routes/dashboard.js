@@ -7,5 +7,6 @@ const { verifyToken } = require("../middleware/auth");
 router.use(verifyToken);
 
 router.route("/").get(dashboardController.getDashboardData);
+router.route("/transactions/recent").get(dashboardController.getRecentTransactions);
 
 module.exports = router;
