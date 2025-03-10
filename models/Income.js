@@ -16,6 +16,23 @@ class Income {
     }
   }
 
+  static async getMonthlyTotals(userId, year) {
+    const query = `
+    SELECT 
+      MONTH(date) as month, 
+      SUM(amount) as total
+    FROM incomes
+    WHERE 
+      user_id = ? AND 
+      YEAR(date) = ?
+    GROUP BY MONTH(date)
+    ORDER BY month
+  `;
+
+    const [results] = await db.execute(query, [userId, year]);
+    return results;
+  }
+
   static async getRecent(userId, limit) {
     try {
       limit = Number(limit);

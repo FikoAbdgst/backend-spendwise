@@ -1,5 +1,6 @@
 const Expense = require("../models/Expense");
 const Income = require("../models/Income");
+const db = require("../config/db");
 
 exports.getDashboardData = async (req, res) => {
   try {
@@ -87,6 +88,166 @@ exports.getRecentTransactions = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to fetch recent transactions",
+      error: error.message,
+    });
+  }
+};
+
+exports.getMonthlyData = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const today = new Date();
+    const monthsData = [];
+
+    for (let i = A5; i >= 0; i--) {
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const endOfMonth = new Date(today.getFullYear(), today.getMonth() - i + 1, 0);
+
+      const startDate = startOfMonth.toISOString().split("T")[0];
+      const endDate = endOfMonth.toISOString().split("T")[0];
+
+      const [incomeResults] = await db.execute(
+        `SELECT COALESCE(SUM(amount), 0) as total FROM incomes 
+         WHERE user_id = ? AND date BETWEEN ? AND ?`,
+        [userId, startDate, endDate]
+      );
+
+      const [expenseResults] = await db.execute(
+        `SELECT COALESCE(SUM(amount), 0) as total FROM expenses 
+         WHERE user_id = ? AND date BETWEEN ? AND ?`,
+        [userId, startDate, endDate]
+      );
+
+      const income = incomeResults[0].total || 0;
+      const expenses = expenseResults[0].total || 0;
+      const balance = income - expenses;
+
+      monthsData.push({
+        month: startOfMonth,
+        income,
+        expenses,
+        balance,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: monthsData,
+    });
+  } catch (error) {
+    console.error("Error fetching monthly data:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch monthly data",
+      error: error.message,
+    });
+  }
+};
+
+exports.getWeeklyData = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const today = new Date();
+    const weeksData = [];
+
+    for (let i = 3; i >= 0; i--) {
+      const endOfWeek = new Date(today);
+      endOfWeek.setDate(today.getDate() - ((today.getDay() + 1) % 7) - i * 7);
+
+      const startOfWeek = new Date(endOfWeek);
+      startOfWeek.setDate(endOfWeek.getDate() - 6);
+
+      const startDate = startOfWeek.toISOString().split("T")[0];
+      const endDate = endOfWeek.toISOString().split("T")[0];
+
+      const [incomeResults] = await db.execute(
+        `SELECT COALESCE(SUM(amount), 0) as total FROM incomes 
+         WHERE user_id = ? AND date BETWEEN ? AND ?`,
+        [userId, startDate, endDate]
+      );
+
+      const [expenseResults] = await db.execute(
+        `SELECT COALESCE(SUM(amount), 0) as total FROM expenses 
+         WHERE user_id = ? AND date BETWEEN ? AND ?`,
+        [userId, startDate, endDate]
+      );
+
+      const income = incomeResults[0].total || 0;
+      const expenses = expenseResults[0].total || 0;
+      const balance = income - expenses;
+
+      weeksData.push({
+        week: i + 1,
+        startDate: startOfWeek,
+        endDate: endOfWeek,
+        income,
+        expenses,
+        balance,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: weeksData,
+    });
+  } catch (error) {
+    console.error("Error fetching weekly data:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch weekly data",
+      error: error.message,
+    });
+  }
+};
+
+exports.getDailyData = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const today = new Date();
+    const dailyData = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+
+      const formattedDate = date.toISOString().split("T")[0];
+
+      const [incomeResults] = await db.execute(
+        `SELECT COALESCE(SUM(amount), 0) as total FROM incomes 
+         WHERE user_id = ? AND date = ?`,
+        [userId, formattedDate]
+      );
+
+      const [expenseResults] = await db.execute(
+        `SELECT COALESCE(SUM(amount), 0) as total FROM expenses 
+         WHERE user_id = ? AND date = ?`,
+        [userId, formattedDate]
+      );
+
+      const income = incomeResults[0].total || 0;
+      const expenses = expenseResults[0].total || 0;
+      const balance = income - expenses;
+
+      dailyData.push({
+        date,
+        income,
+        expenses,
+        balance,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: dailyData,
+    });
+  } catch (error) {
+    console.error("Error fetching daily data:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch daily data",
       error: error.message,
     });
   }

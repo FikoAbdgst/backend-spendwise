@@ -8,5 +8,7 @@ router.use(verifyToken);
 
 router.route("/").get(dashboardController.getDashboardData);
 router.route("/transactions/recent").get(dashboardController.getRecentTransactions);
-
+router.get("/monthly", dashboardController.getMonthlyData);
+router.get("/weekly", dashboardController.getWeeklyData);
+router.get("/daily", dashboardController.getDailyData);
 module.exports = router;
