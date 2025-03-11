@@ -38,7 +38,9 @@ exports.getDashboardData = async (req, res) => {
 exports.getRecentTransactions = async (req, res) => {
   try {
     const userId = req.user.id;
-    let limit = 5;
+    let limit = 10; // Default limit
+    const { filter = "all" } = req.query; // Add filter parameter with default "all"
+
     if (req.query.limit && !isNaN(parseInt(req.query.limit))) {
       limit = parseInt(req.query.limit);
     }
@@ -50,13 +52,22 @@ exports.getRecentTransactions = async (req, res) => {
       });
     }
 
-    if (limit <= 0) limit = 5;
+    if (limit <= 0) limit = 10;
 
-    const recentExpenses = await Expense.getRecent(userId, limit);
-    const recentIncomes = await Income.getRecent(userId, limit);
+    // Get expenses and incomes based on filter
+    let recentExpenses = [];
+    let recentIncomes = [];
+
+    if (filter === "all" || filter === "expense") {
+      recentExpenses = await Expense.getRecent(userId, filter === "expense" ? limit : limit);
+    }
+
+    if (filter === "all" || filter === "income") {
+      recentIncomes = await Income.getRecent(userId, filter === "income" ? limit : limit);
+    }
 
     const formattedExpenses = recentExpenses.map((expense) => ({
-      id: expense.id,
+      id: `expense-${expense.id}`, // Ensure unique ID across both types
       category: expense.category,
       amount: expense.amount,
       icon: expense.icon,
@@ -66,7 +77,7 @@ exports.getRecentTransactions = async (req, res) => {
     }));
 
     const formattedIncomes = recentIncomes.map((income) => ({
-      id: income.id,
+      id: `income-${income.id}`, // Ensure unique ID across both types
       source: income.source,
       amount: income.amount,
       icon: income.icon,
@@ -75,7 +86,19 @@ exports.getRecentTransactions = async (req, res) => {
       type: "income",
     }));
 
-    const combinedTransactions = [...formattedExpenses, ...formattedIncomes]
+    let combinedTransactions = [];
+
+    // Add transactions based on the selected filter
+    if (filter === "all") {
+      combinedTransactions = [...formattedExpenses, ...formattedIncomes];
+    } else if (filter === "expense") {
+      combinedTransactions = formattedExpenses;
+    } else if (filter === "income") {
+      combinedTransactions = formattedIncomes;
+    }
+
+    // Sort by date
+    combinedTransactions = combinedTransactions
       .sort((a, b) => new Date(b.date) - new Date(a.date))
       .slice(0, limit);
 
