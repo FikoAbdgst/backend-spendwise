@@ -4,15 +4,48 @@ const Income = require("../models/Income");
 exports.createIncome = async (req, res) => {
     try {
         const userId = req.user.id;
-        const { icon, source, amount, date } = req.body;
+        let { icon, source, amount, date } = req.body;
 
         // Validate request
-        if (!source || !amount || !date) {
-            return res.status(400).json({ message: "Please provide source, amount, and date" });
+        if (!source || amount === undefined || !date) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide source, amount, and date"
+            });
         }
 
-        // Create income
-        const income = await Income.create(userId, { icon, source, amount, date });
+        // Convert amount to a proper number (if it's a string with formatting)
+        if (typeof amount === 'string') {
+            // Remove any non-numeric characters except decimal point
+            amount = amount.replace(/[^\d.-]/g, '');
+        }
+
+        // Parse to float and ensure it's a valid number
+        amount = parseFloat(amount);
+
+        if (isNaN(amount)) {
+            return res.status(400).json({
+                success: false,
+                message: "Amount must be a valid number"
+            });
+        }
+
+        // Check if amount is within reasonable range for your database
+        // Most likely your DB column is a DECIMAL type with limited precision
+        if (amount < 0 || amount > 999999999) {  // Adjust max value based on your DB schema
+            return res.status(400).json({
+                success: false,
+                message: "Amount is out of valid range"
+            });
+        }
+
+        // Create income with validated amount
+        const income = await Income.create(userId, {
+            icon,
+            source,
+            amount,
+            date
+        });
 
         res.status(201).json({
             success: true,
@@ -27,7 +60,6 @@ exports.createIncome = async (req, res) => {
         });
     }
 };
-
 // Get all income records for a user
 exports.getIncomes = async (req, res) => {
     try {
@@ -84,17 +116,11 @@ exports.getIncome = async (req, res) => {
     }
 };
 
-// Update an income record
 exports.updateIncome = async (req, res) => {
     try {
         const userId = req.user.id;
         const incomeId = req.params.id;
-        const { icon, source, amount, date } = req.body;
-
-        // Validate request
-        if (!source || !amount || !date) {
-            return res.status(400).json({ message: "Please provide source, amount, and date" });
-        }
+        let { icon, source, amount, date } = req.body;
 
         // Check if income exists
         const existingIncome = await Income.findById(incomeId, userId);
@@ -106,13 +132,43 @@ exports.updateIncome = async (req, res) => {
             });
         }
 
+        // Validate and process amount if provided
+        if (amount !== undefined) {
+            // Convert amount to a proper number if it's a string
+            if (typeof amount === 'string') {
+                // Remove any non-numeric characters except decimal point
+                amount = amount.replace(/[^\d.-]/g, '');
+            }
+
+            // Parse to float and ensure it's a valid number
+            amount = parseFloat(amount);
+
+            if (isNaN(amount)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Amount must be a valid number"
+                });
+            }
+
+            // Check if amount is within reasonable range
+            if (amount < 0 || amount > 999999999) {  // Adjust based on your DB schema
+                return res.status(400).json({
+                    success: false,
+                    message: "Amount is out of valid range"
+                });
+            }
+        }
+
+        // Create update data with existing values as fallbacks
+        const updateData = {
+            icon: icon || existingIncome.icon,
+            source: source || existingIncome.source,
+            amount: amount !== undefined ? amount : existingIncome.amount,
+            date: date || existingIncome.date,
+        };
+
         // Update income
-        const updated = await Income.update(incomeId, userId, {
-            icon,
-            source,
-            amount,
-            date,
-        });
+        const updated = await Income.update(incomeId, userId, updateData);
 
         if (!updated) {
             return res.status(400).json({
