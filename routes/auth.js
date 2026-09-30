@@ -293,4 +293,40 @@ router.put("/update-password", require("../middleware/auth").verifyToken, async 
   }
 });
 
+// Hapus seluruh data keuangan milik pengguna (income + expense, saldo dinolkan).
+// Akun (profil + login) tetap dipertahankan.
+router.delete("/reset-data", require("../middleware/auth").verifyToken, async (req, res) => {
+  const userId = req.user.id;
+
+  if (req.body?.confirm !== true) {
+    return res.status(400).json({
+      success: false,
+      message: "Konfirmasi reset diperlukan",
+    });
+  }
+
+  const conn = await db.getConnection();
+  try {
+    await conn.beginTransaction();
+    await conn.query("DELETE FROM `income` WHERE user_id = ?", [userId]);
+    await conn.query("DELETE FROM expenses WHERE user_id = ?", [userId]);
+    await conn.query("UPDATE balances SET amount = 0 WHERE user_id = ?", [userId]);
+    await conn.commit();
+
+    res.status(200).json({
+      success: true,
+      message: "Seluruh data keuangan berhasil dihapus",
+    });
+  } catch (error) {
+    await conn.rollback();
+    console.error("Reset data error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat mereset data",
+    });
+  } finally {
+    conn.release();
+  }
+});
+
 module.exports = router;
